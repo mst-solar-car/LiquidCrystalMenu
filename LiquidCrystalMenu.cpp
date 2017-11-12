@@ -38,6 +38,7 @@ LiquidCrystalMenu::LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5,
 
   this->root_menu = (MenuItem) {
     "$ROOT",
+    NULL,
     new MenuItem[LCDMENU_ARRAY_INCREMENT],
     0, // No submenus
     LCDMENU_ARRAY_INCREMENT,
@@ -54,6 +55,7 @@ void recursiveDelete(MenuItem &item) {
     recursiveDelete(item.submenus[i]);
   }
 
+  item.parent = NULL;
   delete [] item.submenus;
 }
 
@@ -109,6 +111,7 @@ void LiquidCrystalMenu::splashScreen(const String contents[], const int delayMs)
 MenuItem LiquidCrystalMenu::AddMenu(String title) {
   MenuItem item = (MenuItem) {
     title,
+    this->active_menu,
     new MenuItem[LCDMENU_ARRAY_INCREMENT],
     0, // No submenus
     LCDMENU_ARRAY_INCREMENT,
@@ -157,5 +160,70 @@ void LiquidCrystalMenu::Draw() {
       this->lcd->print(menu->submenus[i % this->rows].title);
     }
   }
+}
 
+
+/**
+ * Move Up
+ */
+void LiquidCrystalMenu::Up() {
+  this->active_menu->selected_item--;
+
+  if (this->active_menu->selected_item < 0) {
+    this->active_menu->selected_item = this->active_menu->num_submenus - 1;
+  }
+
+  this->Draw();
+  delay(LCDMENU_ACTION_DEBOUNCE);
+}
+
+
+/**
+ * Move Down
+ */
+void LiquidCrystalMenu::Down() {
+  this->active_menu->selected_item++;
+
+  if (this->active_menu->selected_item >= this->active_menu->num_submenus) {
+    this->active_menu->selected_item = 0;
+  }
+
+  this->Draw();
+  delay(LCDMENU_ACTION_DEBOUNCE);
+}
+
+
+/**
+ * Move backwards up the navigation tree
+ */
+void LiquidCrystalMenu::Back() {
+  if (this->active_menu->parent != NULL) {
+    this->active_menu = this->active_menu->parent;
+  }
+  else {
+    // No parent so just reset the selected item
+    this->active_menu->selected_item = 0;
+  }
+
+  this->Draw();
+  delay(LCDMENU_ACTION_DEBOUNCE);
+}
+
+
+/**
+ * Go into a submenu
+ */
+void LiquidCrystalMenu::Select() {
+  // If there are no submenus then allow the select button to function as a back button
+  if (this->active_menu->num_submenus == 0) {
+    this->Back();
+    return;
+  }
+
+  // Change to the new menu, and reset it
+  this->active_menu = &(this->active_menu->submenus[this->active_menu->selected_item]);
+  this->active_menu->selected_item = 0;
+
+  this->Draw();
+  delay(LCDMENU_ACTION_DEBOUNCE);
 }

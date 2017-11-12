@@ -22,13 +22,19 @@
 #include <LiquidCrystal.h>
 
 
-#define LCDMENU_ARRAY_INCREMENT 2
+/**
+ * Constants
+ */
+#define LCDMENU_ARRAY_INCREMENT   2
+#define LCDMENU_ACTION_DEBOUNCE   350
+
 
 /**
  * Struct that represents an item on a menu
  */
 struct MenuItem {
   String title;
+  MenuItem *parent;
   MenuItem *submenus; // Array of submenus
   int num_submenus;  // Number of submenus
   int submenus_size; // Maximum size of the submenus array
@@ -75,6 +81,18 @@ public:
 
   // Add a new menu item (to the active menu)
   MenuItem AddMenu(String title);
+
+  // Move upwards in the current menu
+  void Up();
+
+  // Move downwards in the current menu
+  void Down();
+
+  // Select a menu option
+  void Select();
+
+  // Back up the navigation tree
+  void Back();
 };
 
 
