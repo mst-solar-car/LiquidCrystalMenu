@@ -22,7 +22,23 @@
 #include <LiquidCrystal.h>
 
 
+#define LCDMENU_ARRAY_INCREMENT 2
 
+/**
+ * Struct that represents an item on a menu
+ */
+struct MenuItem {
+  String title;
+  MenuItem *submenus; // Array of submenus
+  int num_submenus;  // Number of submenus
+  int submenus_size; // Maximum size of the submenus array
+  int selected_item; // Index of the item currently selected
+};
+
+
+/**
+ * Class for interacting and creating a menu system on an LCD
+ */
 class LiquidCrystalMenu {
 private:
   // Pins for the LCD
@@ -39,16 +55,26 @@ private:
   int cols;
   LiquidCrystal* lcd;
 
+  MenuItem root_menu;
+  MenuItem *active_menu;
+
+  void Draw();
+
 public:
   // Constructor
   LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5, int d6, int d7);
 
+  // Destructor
   ~LiquidCrystalMenu();
 
   // Start the library
   void begin(int cols, int rows);
 
+  // Shows a splash screen
+  void splashScreen(const String contents[], const int delayMs = 4000);
 
+  // Add a new menu item (to the active menu)
+  MenuItem AddMenu(String title);
 };
 
 
