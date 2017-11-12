@@ -18,6 +18,14 @@ LiquidCrystalMenu::LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5,
 
 
 /**
+ * Destructor
+ */
+LiquidCrystalMenu::~LiquidCrystalMenu() {
+  delete this->lcd;
+}
+
+
+/**
  * Initialize and begin the library
  */
 void LiquidCrystalMenu::begin(int cols, int rows) {

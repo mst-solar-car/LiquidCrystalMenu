@@ -43,8 +43,12 @@ public:
   // Constructor
   LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5, int d6, int d7);
 
+  ~LiquidCrystalMenu();
+
   // Start the library
   void begin(int cols, int rows);
+
+
 };
 
 
