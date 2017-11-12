@@ -23,6 +23,25 @@ void addToSubmenu(MenuItem* active, MenuItem item) {
 
 
 /**
+ * Recursively finds something in the tree
+ */
+MenuItem* findInTree(const MenuItem &tree, const MenuItem &toFind) {
+  if (toFind.title == tree.title) {
+    return &tree;
+  }
+
+  for (int i = 0; i < tree.num_submenus; i++) {
+    MenuItem* result = findInTree(tree.submenus[i], toFind);
+    if (result != NULL) {
+      return result;
+    }
+  }
+
+  return NULL;
+}
+
+
+/**
  * Basic constructor
  */
 LiquidCrystalMenu::LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5, int d6, int d7) {
@@ -75,7 +94,7 @@ LiquidCrystalMenu::~LiquidCrystalMenu() {
 /**
  * Initialize and begin the library
  */
-void LiquidCrystalMenu::begin(int cols, int rows) {
+void LiquidCrystalMenu::begin(const int cols, const int rows) {
   this->rows = rows;
   this->cols = cols;
 
@@ -108,7 +127,7 @@ void LiquidCrystalMenu::splashScreen(const String contents[], const int delayMs)
 /**
  * Add a menu to the active menu
  */
-MenuItem LiquidCrystalMenu::AddMenu(String title) {
+MenuItem LiquidCrystalMenu::AddMenu(const String title) {
   MenuItem item = (MenuItem) {
     title,
     this->active_menu,
@@ -122,6 +141,34 @@ MenuItem LiquidCrystalMenu::AddMenu(String title) {
 
   this->Draw();
 
+  return item;
+}
+
+
+/**
+ * A a menu to a specific menu option
+ */
+MenuItem LiquidCrystalMenu::AddMenu(const MenuItem &parent, const String title) {
+  MenuItem item = (MenuItem) {
+    title,
+    NULL,
+    new MenuItem[LCDMENU_ARRAY_INCREMENT],
+    0, // No submenus
+    LCDMENU_ARRAY_INCREMENT,
+    0
+  };
+
+  // Find the parent menu in the tree
+  MenuItem* parentPtr = findInTree(this->root_menu, parent);
+
+  if (parentPtr == NULL) {
+    return (MenuItem){"ERROR", NULL, NULL, 0, 0, 0}; // parent is not a valid menu item
+  }
+
+  // Give item a parent
+  item.parent = parentPtr;
+
+  addToSubmenu(parentPtr, item);
   return item;
 }
 
@@ -145,7 +192,6 @@ void LiquidCrystalMenu::Draw() {
   for (int i = menu->selected_item; i < (menu->selected_item + this->rows); i++) {
     // If there are less menu items than rows, do not loop around
     if (i > menu->num_submenus && i < this->rows) {
-      this->lcd->print("BYE");
       break;
     }
 

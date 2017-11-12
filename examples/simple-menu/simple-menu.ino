@@ -19,8 +19,11 @@ LiquidCrystalMenu navigation(12, 11, 9, 5, 4, 3, 2);
 void setup() {
   navigation.begin(LCD_COLS, LCD_ROWS);
   navigation.AddMenu("Test");
-  navigation.AddMenu("Test2");
+  MenuItem menu2 = navigation.AddMenu("Test2");
+  navigation.AddMenu(menu2, "Meow");
+
   navigation.AddMenu("Test3");
+
 
   pinMode(UP_BTN, INPUT);
   pinMode(DOWN_BTN, INPUT);

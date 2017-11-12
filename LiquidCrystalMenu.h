@@ -74,13 +74,16 @@ public:
   ~LiquidCrystalMenu();
 
   // Start the library
-  void begin(int cols, int rows);
+  void begin(const int cols, const int rows);
 
   // Shows a splash screen
   void splashScreen(const String contents[], const int delayMs = 4000);
 
   // Add a new menu item (to the active menu)
-  MenuItem AddMenu(String title);
+  MenuItem AddMenu(const String title);
+
+  // Add a new menu item to a specific menu
+  MenuItem AddMenu(const MenuItem &parent, const String title);
 
   // Move upwards in the current menu
   void Up();
