@@ -29,6 +29,7 @@
 #define LCDMENU_ACTION_DEBOUNCE   350
 
 
+
 /**
  * Struct that represents an item on a menu
  */
@@ -40,6 +41,11 @@ struct MenuItem {
   int submenus_size; // Maximum size of the submenus array
   int selected_item; // Index of the item currently selected
 };
+
+/**
+ * Custom Glyphs
+ */
+#define MENU_ARROW_GLYPH (uint8_t)0
 
 
 /**

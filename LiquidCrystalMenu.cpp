@@ -1,5 +1,9 @@
 #include "LiquidCrystalMenu.h"
 
+// Create glyphs
+byte menuArrow[8] = (byte[8]){0b00000,0b00100,0b00010,0b11111,0b00010,0b00100,0b00000,0b00000};
+
+
 
 // Add a new item to the active menu item
 void addToSubmenu(MenuItem* active, MenuItem item) {
@@ -55,6 +59,10 @@ LiquidCrystalMenu::LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5,
 
   this->lcd = new LiquidCrystal(rs, rw, enable, d4, d5, d6, d7);
 
+  // Register Glyphs with the LCD
+  this->lcd->createChar(MENU_ARROW_GLYPH, menuArrow);
+
+  // Create root menu
   this->root_menu = (MenuItem) {
     "$ROOT",
     NULL,
@@ -200,7 +208,8 @@ void LiquidCrystalMenu::Draw() {
 
     // Display the title of the menu item
     if (i == menu->selected_item) {
-      this->lcd->print("> " + menu->submenus[i % this->rows].title);
+      this->lcd->write(MENU_ARROW_GLYPH);
+      this->lcd->print(menu->submenus[i % this->rows].title);
     }
     else {
       this->lcd->print(menu->submenus[i % this->rows].title);
