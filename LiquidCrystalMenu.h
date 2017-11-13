@@ -27,7 +27,7 @@
  */
 #define LCDMENU_ARRAY_INCREMENT   2
 #define LCDMENU_ACTION_DEBOUNCE   350
-
+#define LCDMENU_REFRESH_INTERVAL  750 // Number of milliseconds to allow for refreshing
 
 
 /**
@@ -35,11 +35,14 @@
  */
 struct MenuItem {
   String title;
+  bool is_value;
   MenuItem *parent;
   MenuItem *submenus; // Array of submenus
   int num_submenus;  // Number of submenus
   int submenus_size; // Maximum size of the submenus array
   int selected_item; // Index of the item currently selected
+  String (*valueFn)(void); // Pointer to function that returns the value (will be called when this menu item is selected)
+  String *value;
 };
 
 /**
@@ -91,6 +94,17 @@ public:
   // Add a new menu item to a specific menu
   MenuItem AddMenu(const MenuItem &parent, const String title);
 
+  // Add a value to the active menu
+  void AddValue(const String title, String (*callback)(void));
+  void AddValue(const String title, String *value);
+
+  // Add a value to a specific menu
+  void AddValue(const MenuItem &parent, const String title, String (*callback)(void));
+  void AddValue(const MenuItem &parent, const String title, String *value);
+
+  // Refresh values currently displayed
+  void RefreshValues();
+
   // Move upwards in the current menu
   void Up();
 
@@ -103,6 +117,15 @@ public:
   // Back up the navigation tree
   void Back();
 };
+
+
+/**
+ * Helper functions
+ */
+void addToSubmenu(MenuItem* active, MenuItem item);
+MenuItem* findInTree(const MenuItem &tre, const MenuItem &toFind);
+
+MenuItem makeMenuItem(const String title);
 
 
 #endif
