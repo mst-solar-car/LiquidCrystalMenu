@@ -2,14 +2,17 @@
  * This is the most basic example of how to use the LiquidCrystalMenu
  * library.
  *
- * You should probably be comfortable working with buttons:
- * https://www.arduino.cc/en/Tutorial/Button
+ * You should fully understand the simple-menu example before trying this example.
  *
  * ---
- * Create a menu is really simple once you create your LiquidCrystalMenu object
+ * Create a nested menus is just as simple as creating the most basic menus.
+ * All you need to do is *save* the return value from addMenu() and use it to
+ * create your submenus.
  *
- * To add a menu all you need is the following:
- *  menu.addMenu("Name of Menu");
+ * The addMenu() method returns a value of type MenuID.
+ *
+ *  MenuID parent = menu.addMenu("Parent Menu");
+ *  menu.addMenu(parent, "Child Menu");
  *
  * Where menu is your LiquidCrystalMenu object
  *
@@ -18,12 +21,23 @@
  *
  *  menu.down();    // This will move down in your menu
  *
+ *  menu.select();  // Navigate into a submenu
+ *
+ *  menu.back();    // Leave a submenu
+ *
  *
  * ---
  * The example below creates this menu system:
  * - Menu 1
+ *    - Menu 1.1
  * - Menu 2
+ *    - Menu 2.1
+ *    - Menu 2.2
  * - Menu 3
+ *    - Menu 3.1
+ *        - Menu 3.1.1
+ *        - Menu 3.1.2
+ *    - Menu 3.2
  */
 #include <LiquidCrystalMenu.h>
 
@@ -59,10 +73,21 @@ void setup() {
   // Initialize the LCD menu with LCD display size
   navigation.begin(LCD_COLS, LCD_ROWS);
 
-  // Add our menus at a root level
-  navigation.addMenu("Menu 1");
-  navigation.addMenu("Menu 2");
-  navigation.addMenu("Menu 3");
+  // Add our menus
+  MenuID menu1 = navigation.addMenu("Menu 1");
+  navigation.addMenu(menu1, "Menu 1.1"); // This menu option will be a submenu of "Menu 1"
+
+  MenuID menu2 = navigation.addMenu("Menu 2");
+  navigation.addMenu(menu2, "Menu 2.1"); // Submenu inside of "Menu 2"
+  navigation.addMenu(menu2, "Menu 2.2");
+
+  MenuID menu3 = navigation.addMenu("Menu 3");
+  MenuID menu31 = navigation.addMenu(menu3, "Menu 3.1");
+  navigation.addMenu(menu31, "Menu 3.1.1");  // Third level menus
+  navigation.addMenu(menu31, "Menu 3.1.2");
+
+  navigation.addMenu(menu3, "Menu 3.2");
+
 
   // Configure our buttons as inputs
   pinMode(UP_BTN, INPUT);

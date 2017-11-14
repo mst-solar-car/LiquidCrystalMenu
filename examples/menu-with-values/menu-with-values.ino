@@ -1,29 +1,34 @@
 /**
- * This is the most basic example of how to use the LiquidCrystalMenu
- * library.
+ * This example is one of the more complex examples provided.
  *
- * You should probably be comfortable working with buttons:
- * https://www.arduino.cc/en/Tutorial/Button
+ * You should be fully comfortable with creating multi-leveled menus before
+ * moving onto this example.
  *
- * ---
- * Create a menu is really simple once you create your LiquidCrystalMenu object
+ * You will also want to have a knowledge, and understanding,
+ * of pointers and how they function.
  *
- * To add a menu all you need is the following:
- *  menu.addMenu("Name of Menu");
- *
- * Where menu is your LiquidCrystalMenu object
- *
- * To navigate your menu you can use the following methods:
- *  menu.up();      // This will move up in your menu
- *
- *  menu.down();    // This will move down in your menu
- *
+ * For information on pointers see:
+ * https://www.arduino.cc/reference/en/language/structure/pointer-access-operators/reference/
  *
  * ---
- * The example below creates this menu system:
- * - Menu 1
- * - Menu 2
- * - Menu 3
+ * All values used for displaying on the LCD MUST be of type String
+ *
+ * You can provide a value in two ways:
+ *
+ * 1. Variable Pointer
+ *  menu.addValue("Value Name", &stringVariable);
+ *
+ *  Where stringVariable is a variable of type String
+ *  and menu is your LiquidCrystalMenu object
+ *
+ * 2. Pointer to a Function
+ *  If the values that you want to display need type conversion, or some computation,
+ *  then you can also provide a value using a pointer to a function that returns
+ *  a String and accepts no parameters.
+ *
+ *  String myValue() { return "Sample Value"; }
+ *  ...
+ *  menu.addValue("Value Name", &myValue);
  */
 #include <LiquidCrystalMenu.h>
 
@@ -55,14 +60,24 @@
 LiquidCrystalMenu navigation(LCD_RS, LCD_RW, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
 
+String myValueFunction() {
+  return "Value1";
+}
+
+String myValueVar;
+
 void setup() {
   // Initialize the LCD menu with LCD display size
   navigation.begin(LCD_COLS, LCD_ROWS);
 
-  // Add our menus at a root level
-  navigation.addMenu("Menu 1");
-  navigation.addMenu("Menu 2");
-  navigation.addMenu("Menu 3");
+  myValueVar = "Value2";
+
+  // Add our menus and values
+  MenuID menu1 = navigation.addMenu("Menu 1");
+  navigation.addValue(menu1, "Value Variable", &myValueVar); // Value on a submenu
+
+  navigation.addValue("Value Function", &myValueFunction);
+
 
   // Configure our buttons as inputs
   pinMode(UP_BTN, INPUT);
