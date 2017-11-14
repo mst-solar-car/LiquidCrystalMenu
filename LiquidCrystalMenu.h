@@ -30,20 +30,23 @@
 #define LCDMENU_REFRESH_INTERVAL  750 // Number of milliseconds to allow for refreshing
 
 
+// Type alias
+typedef int MenuID;
+
 /**
- * Struct that represents an item on a menu
+ * Doubly Linked List node that represents something on a menu
  */
-struct MenuItem {
+struct MenuNode {
   String title;
-  bool is_value;
-  MenuItem *parent;
-  MenuItem *submenus; // Array of submenus
-  int num_submenus;  // Number of submenus
-  int submenus_size; // Maximum size of the submenus array
-  int selected_item; // Index of the item currently selected
-  String (*valueFn)(void); // Pointer to function that returns the value (will be called when this menu item is selected)
+  String (*valueFn)(void);
   String *value;
+
+  MenuNode *parent;
+  MenuNode *submenu;
+  MenuNode *previous;
+  MenuNode *next;
 };
+
 
 /**
  * Custom Glyphs
@@ -70,10 +73,16 @@ private:
   int cols;
   LiquidCrystal* lcd;
 
-  MenuItem root_menu;
-  MenuItem *active_menu;
+  MenuNode *root; // Root menu
+  MenuNode *menu; // Currently selected MenuNode
 
-  void Draw();
+  void draw();
+
+  // Finds an item with a memory address
+  MenuNode* findNodeWithAddr(MenuNode *node, const MenuID &memAddr);
+
+  // Adds to a menu
+  void addNode(MenuNode *root, MenuNode *toAdd);
 
 public:
   // Constructor
@@ -86,46 +95,43 @@ public:
   void begin(const int cols, const int rows);
 
   // Shows a splash screen
-  void splashScreen(const String contents[], const int delayMs = 4000);
+  void splash(const String contents[], const int delayMs = 4000);
 
-  // Add a new menu item (to the active menu)
-  MenuItem AddMenu(const String title);
+  // Add a new menu item (to the root menu)
+  MenuID addMenu(const String title);
 
   // Add a new menu item to a specific menu
-  MenuItem AddMenu(const MenuItem &parent, const String title);
+  MenuID addMenu(const MenuID &parent, const String title);
 
-  // Add a value to the active menu
-  void AddValue(const String title, String (*callback)(void));
-  void AddValue(const String title, String *value);
+  // Add a value to the root menus
+  void addValue(const String title, String (*callback)(void));
+  void addValue(const String title, String *value);
 
   // Add a value to a specific menu
-  void AddValue(const MenuItem &parent, const String title, String (*callback)(void));
-  void AddValue(const MenuItem &parent, const String title, String *value);
+  void addValue(const MenuID &parent, const String title, String (*callback)(void), String *value = nullptr );
+  void addValue(const MenuID &parent, const String title, String *value);
 
   // Refresh values currently displayed
-  void RefreshValues();
+  void refreshValues();
 
   // Move upwards in the current menu
-  void Up();
+  void up();
 
   // Move downwards in the current menu
-  void Down();
+  void down();
 
   // Select a menu option
-  void Select();
+  void select();
 
   // Back up the navigation tree
-  void Back();
+  void back();
 };
 
 
-/**
- * Helper functions
- */
-void addToSubmenu(MenuItem* active, MenuItem item);
-MenuItem* findInTree(const MenuItem &tre, const MenuItem &toFind);
-
-MenuItem makeMenuItem(const String title);
+// Helper functions
+MenuNode* newMenuNode(const String &title, String (*fn)(void) = nullptr, String *val = nullptr);
+void deleteMenuNode(MenuNode *node);
+MenuNode* getLastNodeInList(MenuNode *list);
 
 
 #endif

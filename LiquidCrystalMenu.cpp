@@ -21,21 +21,9 @@ LiquidCrystalMenu::LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5,
   // Register Glyphs with the LCD
   this->lcd->createChar(MENU_ARROW_GLYPH, menuArrow);
 
-  // Create root menu
-  this->root_menu = makeMenuItem("$ROOT");
-
-  this->active_menu = &(this->root_menu);
-}
-
-
-// Recursively clean up menu items
-void recursiveDelete(MenuItem &item) {
-  for (int i = 0; i < item.num_submenus; i++) {
-    recursiveDelete(item.submenus[i]);
-  }
-
-  item.parent = NULL;
-  delete [] item.submenus;
+  // Initialize pointers
+  this->root = newMenuNode(F("$ROOT"), nullptr, nullptr);
+  this->menu = this->root;
 }
 
 
@@ -44,10 +32,12 @@ void recursiveDelete(MenuItem &item) {
  */
 LiquidCrystalMenu::~LiquidCrystalMenu() {
   delete this->lcd;
+  this->lcd = nullptr;
 
-  recursiveDelete(this->root_menu);
-
-  this->active_menu = NULL;
+  // Delete everything
+  deleteMenuNode(this->root);
+  this->root = nullptr;
+  this->menu = nullptr;
 }
 
 
@@ -62,14 +52,14 @@ void LiquidCrystalMenu::begin(const int cols, const int rows) {
   this->lcd->begin(cols, rows);
   this->lcd->clear();
 
-  this->Draw();
+  this->draw();
 }
 
 
 /**
  * Custom Splash Screen for the display
  */
-void LiquidCrystalMenu::splashScreen(const String contents[], const int delayMs) {
+void LiquidCrystalMenu::splash(const String contents[], const int delayMs) {
   this->lcd->clear();
 
   // Display number of rows
@@ -85,112 +75,113 @@ void LiquidCrystalMenu::splashScreen(const String contents[], const int delayMs)
 
 
 /**
- * Add a menu to the active menu
+ * A a menu to a specific menu
  */
-MenuItem LiquidCrystalMenu::AddMenu(const String title) {
-  MenuItem item = makeMenuItem(title);
-  item.parent = this->active_menu;
+MenuID LiquidCrystalMenu::addMenu(const MenuID &parent, const String title) {
+  // Find parent
+  MenuNode *parentPtr = this->findNodeWithAddr(this->root, parent);
 
-  addToSubmenu(this->active_menu, item);
+  // Create new node
+  MenuNode *toAdd = newMenuNode(title, nullptr, nullptr);
 
-  this->Draw();
+  // Add the menu node
+  this->addNode(parentPtr, toAdd);
 
-  return item;
+  // Redraw
+  this->draw();
+
+  return (MenuID)toAdd;
 }
 
 
 /**
- * A a menu to a specific menu option
+ * Add a menu to the root menu
  */
-MenuItem LiquidCrystalMenu::AddMenu(const MenuItem &parent, const String title) {
-  MenuItem item = makeMenuItem(title);
-
-  // Find the parent menu in the tree
-  MenuItem* parentPtr = findInTree(this->root_menu, parent);
-
-  if (parentPtr == NULL) {
-    return (MenuItem){"ERROR", NULL, NULL, 0, 0, 0}; // parent is not a valid menu item
-  }
-
-  // Give item a parent
-  item.parent = parentPtr;
-
-  addToSubmenu(parentPtr, item);
-  return item;
+MenuID LiquidCrystalMenu::addMenu(const String title) {
+  return this->addMenu((MenuID)(this->root), title);
 }
 
 
 /**
  * Adds a value to the menu
  */
-void LiquidCrystalMenu::AddValue(const MenuItem &parent, const String title, String (*callback)(void)) {
-  MenuItem item = makeMenuItem(title);
-  item.is_value = true;
-  item.valueFn = callback;
+void LiquidCrystalMenu::addValue(const MenuID &parent, const String title, String (*callback)(void), String *value /*= nullptr*/) {
+  // Find parent
+  MenuNode *parentPtr = this->findNodeWithAddr(this->root, parent);
 
-  // Find the parent menu in the tree
-  MenuItem* parentPtr = findInTree(this->root_menu, parent);
+  // Create new node
+  MenuNode *toAdd = newMenuNode(title, callback, value);
 
-  if (parentPtr == NULL) {
-    return (MenuItem){"ERROR", NULL, NULL, 0, 0, 0}; // parent is not a valid menu item
-  }
+  // Add the node
+  this->addNode(parentPtr, toAdd);
 
-  // Give item a parent
-  item.parent = parentPtr;
-
-  addToSubmenu(parentPtr, item);
+  this->draw();
 }
 
 
 /**
- * Adds a value to the menu
+ * Adds a value to a specific menu
  */
-void LiquidCrystalMenu::AddValue(const MenuItem &parent, const String title, String *value) {
-  MenuItem item = makeMenuItem(title);
-  item.is_value = true;
-  item.value = value;
-
-  // Find the parent menu in the tree
-  MenuItem* parentPtr = findInTree(this->root_menu, parent);
-
-  if (parentPtr == NULL) {
-    return (MenuItem){"ERROR", NULL, NULL, 0, 0, 0}; // parent is not a valid menu item
-  }
-
-  // Give item a parent
-  item.parent = parentPtr;
-
-  addToSubmenu(parentPtr, item);
+void LiquidCrystalMenu::addValue(const MenuID &parent, const String title, String *value) {
+  return this->addValue(parent, title, nullptr, value);
 }
 
 
 /**
  * Add a value to the root
  */
-void LiquidCrystalMenu::AddValue(const String title, String (*callback)(void)) {
-  return this->AddValue(*(this->active_menu), title, callback);
+void LiquidCrystalMenu::addValue(const String title, String (*callback)(void)) {
+  return this->addValue((MenuID)(this->root), title, callback);
 }
 
 
 /**
  * Add a value to the root
  */
-void LiquidCrystalMenu::AddValue(const String title, String *value) {
-  return this->AddValue(*(this->active_menu), title, value);
+void LiquidCrystalMenu::addValue(const String title, String *value) {
+  return this->addValue((MenuID)(this->root), title, value);
+}
+
+
+/**
+ * Generic add a node somewhere in the menu system
+ */
+void LiquidCrystalMenu::addNode(MenuNode *root, MenuNode *toAdd) {
+  MenuNode *tmp = nullptr;
+
+  toAdd->parent = root; // Give the new element a parent
+
+  // Handle adding something to the root menu
+  if (root == this->root) {
+    tmp = getLastNodeInList(root);
+    tmp->next = toAdd;
+    toAdd->previous = tmp;
+    return;
+  }
+
+  // Handle not adding to the root menu
+  if (root->submenu == nullptr) {
+    // First in submenu
+    root->submenu = toAdd;
+  }
+  else {
+    // Add at the end of the submenu
+    tmp = getLastNodeInList(root->submenu);
+    tmp->next = toAdd;
+    toAdd->previous = tmp;
+  }
 }
 
 
 /**
  * Refresh the value currently being displayed
  */
-void LiquidCrystalMenu::RefreshValues() {
+void LiquidCrystalMenu::refreshValues() {
   static unsigned long last_refresh = 0;
 
   if (millis() - last_refresh > LCDMENU_REFRESH_INTERVAL) {
-    MenuItem *menu = this->active_menu; // Alias
-
-    if (menu->is_value == true && (menu->valueFn != NULL || menu->value != NULL)) {
-      this->Draw();
+    if (this->menu->valueFn != nullptr || this->menu->value != nullptr) {
+      this->draw();
     }
 
     last_refresh = millis();
@@ -201,56 +192,58 @@ void LiquidCrystalMenu::RefreshValues() {
 /**
  * Renders the active menu
  */
-void LiquidCrystalMenu::Draw() {
+void LiquidCrystalMenu::draw() {
   this->lcd->clear();
   this->lcd->setCursor(0, 0);
 
-  MenuItem *menu = this->active_menu; // Alias
+  // Just in case
+  if (this->menu == nullptr) {
+    this->menu = this->root;
+  }
 
   // Show value if this is a value
-  if (menu->is_value == true && (menu->valueFn != NULL || menu->value != NULL)) {
+  if (this->menu->valueFn != nullptr || this->menu->value != nullptr) {
     // Give section a title
-    this->lcd->print(menu->title);
+    this->lcd->print(this->menu->title);
     this->lcd->print(":");
     this->lcd->setCursor(0, 1);
 
-    // Retrieve the current value
     String val;
-    if (menu->valueFn != NULL) {
-      val = (menu->valueFn)();
+    if (this->menu->valueFn != nullptr) {
+      val = (this->menu->valueFn)();
     }
     else {
-      val = *(menu->value);
+      val = *(this->menu->value);
     }
 
     this->lcd->print(val);
     return;
   }
 
-  // Show if the menu is empty
-  if (menu->num_submenus == 0) {
-    this->lcd->print("Empty");
-    return;
+  // Display the menu options
+  MenuNode *ptr = this->menu;
+  short row = 0;
+
+  // Do not show the $ROOT element
+  if (ptr == this->root) {
+    ptr = ptr->next;
+
+    // Force a change from the menu
+    if (ptr != nullptr) {
+      this->menu = ptr;
+    }
   }
 
-  // Show the menu items
-  for (int i = menu->selected_item; i < (menu->selected_item + this->rows); i++) {
-    // If there are less menu items than rows, do not loop around
-    if (i > menu->num_submenus && i < this->rows) {
-      break;
-    }
+  while (ptr != nullptr && row < this->rows) {
+    this->lcd->setCursor(0, row);
 
-    // Position cursor on appropriate row
-    this->lcd->setCursor(0, (i - menu->selected_item) % this->rows);
-
-    // Display the title of the menu item
-    if (i == menu->selected_item) {
+    if (row == 0) {
       this->lcd->write(MENU_ARROW_GLYPH);
-      this->lcd->print(menu->submenus[i % this->rows].title);
     }
-    else {
-      this->lcd->print(menu->submenus[i % this->rows].title);
-    }
+
+    this->lcd->print(ptr->title);
+    ptr = ptr->next;
+    row++;
   }
 }
 
@@ -258,14 +251,13 @@ void LiquidCrystalMenu::Draw() {
 /**
  * Move Up
  */
-void LiquidCrystalMenu::Up() {
-  this->active_menu->selected_item--;
-
-  if (this->active_menu->selected_item < 0) {
-    this->active_menu->selected_item = this->active_menu->num_submenus - 1;
+void LiquidCrystalMenu::up() {
+  // Change to the previous menu item if there is one
+  if (this->menu->previous != nullptr) {
+    this->menu = this->menu->previous;
+    this->draw();
   }
 
-  this->Draw();
   delay(LCDMENU_ACTION_DEBOUNCE);
 }
 
@@ -273,14 +265,13 @@ void LiquidCrystalMenu::Up() {
 /**
  * Move Down
  */
-void LiquidCrystalMenu::Down() {
-  this->active_menu->selected_item++;
-
-  if (this->active_menu->selected_item >= this->active_menu->num_submenus) {
-    this->active_menu->selected_item = 0;
+void LiquidCrystalMenu::down() {
+  // Change to the next menu item if there is one
+  if (this->menu->next != nullptr) {
+    this->menu = this->menu->next;
+    this->draw();
   }
 
-  this->Draw();
   delay(LCDMENU_ACTION_DEBOUNCE);
 }
 
@@ -288,16 +279,13 @@ void LiquidCrystalMenu::Down() {
 /**
  * Move backwards up the navigation tree
  */
-void LiquidCrystalMenu::Back() {
-  if (this->active_menu->parent != NULL) {
-    this->active_menu = this->active_menu->parent;
-  }
-  else {
-    // No parent so just reset the selected item
-    this->active_menu->selected_item = 0;
+void LiquidCrystalMenu::back() {
+  // Change to the parent menu if there is one
+  if (this->menu->parent != nullptr) {
+    this->menu = this->menu->parent;
+    this->draw();
   }
 
-  this->Draw();
   delay(LCDMENU_ACTION_DEBOUNCE);
 }
 
@@ -305,80 +293,108 @@ void LiquidCrystalMenu::Back() {
 /**
  * Go into a submenu
  */
-void LiquidCrystalMenu::Select() {
-  // If there are no submenus then allow the select button to function as a back button
-  if (this->active_menu->num_submenus == 0) {
-    this->Back();
-    return;
+void LiquidCrystalMenu::select() {
+  // If no submenu then don't do anything
+  if (this->menu->submenu != nullptr) {
+    this->menu = this->menu->submenu;
+    this->draw();
   }
 
-  // Change to the new menu, and reset it
-  this->active_menu = &(this->active_menu->submenus[this->active_menu->selected_item]);
-  this->active_menu->selected_item = 0;
-
-  this->Draw();
   delay(LCDMENU_ACTION_DEBOUNCE);
 }
 
 
+/**
+ * Finds a menu node with a certain memory address
+ */
+MenuNode* LiquidCrystalMenu::findNodeWithAddr(MenuNode *node, const MenuID &memAddr) {
+  MenuNode *tmp = nullptr;
 
-
-/**************************************
- *         HELPER FUNCTIONS           *
- **************************************/
-// Add a new item to the active menu item
-void addToSubmenu(MenuItem* active, MenuItem item) {
-  if (active->num_submenus >= active->submenus_size) {
-    // Increase array size
-    MenuItem *newArr = new MenuItem[active->submenus_size + LCDMENU_ARRAY_INCREMENT];
-
-    for (int i = 0; i < active->num_submenus; i++) {
-      newArr[i] = active->submenus[i];
-    }
-
-    delete [] active->submenus;
-    active->submenus = newArr;
-    newArr = NULL;
+  // Check the node that is about to be searched
+  if ((MenuID)node == memAddr) {
+    return node;
   }
 
-  // Add the new menu item
-  active->submenus[active->num_submenus] = item;
-  active->num_submenus++;
+  // Check the next item
+  if (node->next != nullptr) {
+    tmp = this->findNodeWithAddr(node->next, memAddr);
+    if (tmp != nullptr) {
+      return tmp;
+    }
+  }
+
+  // Search submenus
+  if (node->submenu != nullptr) {
+    tmp = this->findNodeWithAddr(node->submenu, memAddr);
+    if (tmp != nullptr) {
+      return tmp;
+    }
+  }
+
+  return this->root; // Not found
+}
+
+
+
+
+
+
+
+
+
+/**
+ * Helper function for creating a new MenuNode and initializing values
+ */
+MenuNode* newMenuNode(const String &title, String (*fn)(void), String *val) {
+  MenuNode *node = new MenuNode;
+  node->title = title;
+  node->parent = nullptr;
+  node->submenu = nullptr;
+  node->previous = nullptr;
+  node->next = nullptr;
+  node->valueFn = nullptr;
+  node->value = nullptr;
+
+  if (fn != nullptr || val != nullptr) {
+    MenuNode* subNode = node->submenu = newMenuNode(title, nullptr, nullptr);
+    subNode->parent = node;
+    subNode->valueFn = fn;
+    subNode->value = val;
+  }
+
+  return node;
 }
 
 
 /**
- * Recursively finds something in the tree
+ * Destructor for a menu node
  */
-MenuItem* findInTree(const MenuItem &tree, const MenuItem &toFind) {
-  if (toFind.title == tree.title) {
-    return &tree;
+void deleteMenuNode(MenuNode *node) {
+  if (node->next != nullptr) {
+    deleteMenuNode(node->next);
+    node->next = nullptr;
   }
 
-  for (int i = 0; i < tree.num_submenus; i++) {
-    MenuItem* result = findInTree(tree.submenus[i], toFind);
-    if (result != NULL) {
-      return result;
-    }
+  if (node->submenu != nullptr) {
+    deleteMenuNode(node->submenu);
+    node->submenu = nullptr;
   }
 
-  return NULL;
+  node->parent = NULL;
+  node->previous = NULL;
+  node->valueFn = NULL;
+  node->value = NULL;
 }
 
 
 /**
- * Easily create a new MenuItem
+ * Returns the last node in a list
  */
-MenuItem makeMenuItem(const String title) {
-  return (MenuItem) {
-    title,
-    false, // Not a value
-    NULL,  // No parent
-    new MenuItem[LCDMENU_ARRAY_INCREMENT],
-    0, // No submenus
-    LCDMENU_ARRAY_INCREMENT,
-    0, // Selected item
-    NULL, // No function to get value
-    NULL, // No pointer to a value
-  };
+MenuNode* getLastNodeInList(MenuNode *list) {
+  MenuNode *ptr = list;
+  while (ptr->next != nullptr) {
+    ptr = ptr->next;
+  }
+
+  return ptr;
 }
