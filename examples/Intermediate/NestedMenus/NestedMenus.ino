@@ -2,7 +2,7 @@
  * This is the most basic example of how to use the LiquidCrystalMenu
  * library.
  *
- * You should fully understand the simple-menu example before trying this example.
+ * You should fully understand the SimpleMenu example before trying this example.
  *
  * ---
  * Create a nested menus is just as simple as creating the most basic menus.

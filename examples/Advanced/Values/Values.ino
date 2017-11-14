@@ -1,8 +1,8 @@
 /**
  * This example is one of the more complex examples provided.
  *
- * You should be fully comfortable with creating multi-leveled menus before
- * moving onto this example.
+ * You should be fully comfortable with creating nested menus (NestedMenus example)
+ * before moving onto this example.
  *
  * You will also want to have a knowledge, and understanding,
  * of pointers and how they function.

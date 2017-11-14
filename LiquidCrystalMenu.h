@@ -25,9 +25,15 @@
 /**
  * Constants
  */
-#define LCDMENU_ARRAY_INCREMENT   2
-#define LCDMENU_ACTION_DEBOUNCE   350
-#define LCDMENU_REFRESH_INTERVAL  750 // Number of milliseconds to allow for refreshing
+#ifndef LCDMENU_ARRAY_INCREMENT
+  #define LCDMENU_ARRAY_INCREMENT   2
+#endif
+#ifndef LCDMENU_ACTION_DEBOUNCE
+  #define LCDMENU_ACTION_DEBOUNCE   350
+#endif
+#ifndef LCDMENU_REFRESH_INTERVAL
+  #define LCDMENU_REFRESH_INTERVAL  750 // Number of milliseconds to allow for refreshing
+#endif
 
 
 // Type alias

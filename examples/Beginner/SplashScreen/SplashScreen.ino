@@ -2,7 +2,7 @@
  * This splash screen example demonstartes how you can implement a splash screen
  * in your LCD Menu
  *
- * You should fully understand the simple-menu example before looking at this example.
+ * You should fully understand the SimpleMenu example before looking at this example.
  *
  * You should also be comfortable working with arrays:
  * https://www.arduino.cc/en/Tutorial/Arrays

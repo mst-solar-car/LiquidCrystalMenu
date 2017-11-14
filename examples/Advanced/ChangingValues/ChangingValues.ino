@@ -1,11 +1,10 @@
 /**
  * This example is the most complex one.
  *
- * You should absolutely be comfortable with the menu-with-values example,
- * and all the other examples.
- * *
- * You will also want a knowledge, and understanding,
- * of pointers and how they function.
+ * You should absolutely be comfortable with the Values example, and all the
+ * other examples.
+ *
+ * You will also want a knowledge, and understanding, of pointers.
  *
  * For information on pointers see:
  * https://www.arduino.cc/reference/en/language/structure/pointer-access-operators/reference/
