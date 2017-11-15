@@ -48,8 +48,20 @@ D7
 
 Once you have those pins connected you can call the constructor
 ```c
-LiquidCrystalMenu myMenuObject(RS, RW, EN, D4, D5, D6, D7);
+LiquidCrystalMenu myMenu(RS, RW, EN, D4, D5, D6, D7);
 ```
+
+Next, inside your `setup()` function you'll want to perform the following:
+
+```c
+// cols should be the number of columns your LCD has
+// rows should be the number of rows your LCD has
+myMenu.begin(cols, rows);
+```
+This will initialize the library so it can accurataly display stuff on your LCD.
+
+&nbsp;
+
 
 ## Splash Screens
 For some projects it could be desirable to have a splash screen displayed on boot. This is easily done using the `splash(String[], uint8_t)`.
@@ -72,7 +84,7 @@ String mySplashScreen[] = {
 };
 
 // Display splash screen for 3 seconds
-myMenuObject.splash(mySplashScreen, 3000);
+myMenu.splash(mySplashScreen, 3000);
 ```
 
 It is recomended that you have your splash screen displayed before adding anything
@@ -90,8 +102,8 @@ Parameter | Type | Description | Default |
 
 
 ```c
-myMenuObject.addMenu("Option 1");
-myMenuObject.addMenu("Option 2");
+myMenu.addMenu("Option 1");
+myMenu.addMenu("Option 2");
 ```
 
 This will result in the following menu structure:
@@ -113,9 +125,9 @@ Parameter | Type | Description | Default |
 
 
 ```c
-MenuID option1 = myMenuObject.addMenu("Option 1");
-myMenuObject.addMenu(option1, "Option 1.1");
-myMenuObject.addMenu("Option 2");
+MenuID option1 = myMenu.addMenu("Option 1");
+myMenu.addMenu(option1, "Option 1.1");
+myMenu.addMenu("Option 2");
 ```
 
 This will give the following menu structure:
@@ -149,10 +161,10 @@ String myValueFunction() {
   return "Sample Value";
 }
 
-MenuID dataMenu = myMenuObject.addMenu("Data");
-myMenuObject.addValue(dataMenu, "Sample", &myValueFunction);
+MenuID dataMenu = myMenu.addMenu("Data");
+myMenu.addValue(dataMenu, "Sample", &myValueFunction);
 
-myMenuObject.addMenu("Not Data");
+myMenu.addMenu("Not Data");
 ```
 
 or
@@ -160,10 +172,10 @@ or
 ```c
 String myValue = "Sample Value";
 
-MenuID dataMenu = myMenuObject.addMenu("Data");
-myMenuObject.addValue(dataMenu, "Sample", &myValue);
+MenuID dataMenu = myMenu.addMenu("Data");
+myMenu.addValue(dataMenu, "Sample", &myValue);
 
-myMenuObject.addMenu("Not Data");
+myMenu.addMenu("Not Data");
 ```
 
 Both of these will create the following menu structure:
