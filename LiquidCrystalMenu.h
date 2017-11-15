@@ -32,6 +32,13 @@
   #define LCDMENU_REFRESH_INTERVAL  750 // Number of milliseconds to allow for refreshing
 #endif
 
+/**
+ * Enum for events
+ */
+enum MenuEvent {
+  FocusEvent,    // When a menu item gains focus
+  SelectEvent   // When a menu value is selected
+};
 
 // Type alias
 typedef int MenuID;
@@ -48,6 +55,9 @@ struct MenuNode {
   MenuNode *submenu;
   MenuNode *previous;
   MenuNode *next;
+
+  void (*focusEvent)(void);
+  void (*selectEvent)(void);
 };
 
 
@@ -81,6 +91,16 @@ private:
 
   // Initialize (constructor)
   void init();
+
+  // Retrieves the value of a node
+  String* getValue(MenuNode *node);
+
+  // Attach an event listener
+  void attach(const MenuEvent &event, MenuNode *node, void (*callback)(void));
+
+  // Dispatch an event callback to a node
+  void dispatch(const MenuEvent &event, MenuNode *node);
+
 
 public:
   // Constructors
@@ -119,12 +139,15 @@ public:
   MenuID addMenu(const MenuID &parent, const char *title);
 
   // Add a value to the root menus
-  void addValue(const char *title, String (*callback)(void));
-  void addValue(const char *title, String *value);
+  MenuID addValue(const char *title, String (*callback)(void));
+  MenuID addValue(const char *title, String *value);
 
   // Add a value to a specific menu
-  void addValue(const MenuID &parent, const char *title, String (*callback)(void), String *value = nullptr );
-  void addValue(const MenuID &parent, const char *title, String *value);
+  MenuID addValue(const MenuID &parent, const char *title, String (*callback)(void), String *value = nullptr );
+  MenuID addValue(const MenuID &parent, const char *title, String *value);
+
+  // Attach an event to a menu item
+  void listen(const MenuEvent &event, const MenuID &menu, void (*callback)(void));
 
   // Refresh values currently displayed
   void refreshValues();
