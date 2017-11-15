@@ -149,6 +149,9 @@ public:
   // Attach an event to a menu item
   void listen(const MenuEvent &event, const MenuID &menu, void (*callback)(void));
 
+  // Retrieves a value
+  String getValue(const MenuID &menu);
+
   // Refresh values currently displayed
   void refreshValues();
 

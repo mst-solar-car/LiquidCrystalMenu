@@ -190,35 +190,23 @@ void LiquidCrystalMenu::listen(const MenuEvent &event, const MenuID &menu, void 
 }
 
 
-
 /**
- * Generic add a node somewhere in the menu system
+ * Retrieves the value of a menu item (if it has one)
  */
-void LiquidCrystalMenu::addNode(MenuNode *root, MenuNode *toAdd) {
-  MenuNode *tmp = nullptr;
-
-  toAdd->parent = root; // Give the new element a parent
-
-  // Handle adding something to the root menu
-  if (root == this->root) {
-    tmp = getLastNodeInList(root);
-    tmp->next = toAdd;
-    toAdd->previous = tmp;
-    return;
+String LiquidCrystalMenu::getValue(const MenuID &menu) {
+  MenuNode *node = this->findNodeWithAddr(this->root, menu);
+  if (node == this->root) {
+    return "";
   }
 
-  // Handle not adding to the root menu
-  if (root->submenu == nullptr) {
-    // First in submenu
-    root->submenu = toAdd;
+  String *val = this->getValue(node->submenu);
+  if (val == nullptr) {
+    return "";
   }
-  else {
-    // Add at the end of the submenu
-    tmp = getLastNodeInList(root->submenu);
-    tmp->next = toAdd;
-    toAdd->previous = tmp;
-  }
+
+  return *val;
 }
+
 
 
 /**
@@ -395,6 +383,10 @@ MenuNode* LiquidCrystalMenu::findNodeWithAddr(MenuNode *node, const MenuID &memA
  * Returns the value of a node (if it has one)
  */
 String* LiquidCrystalMenu::getValue(MenuNode *node) {
+  if (node == nullptr) {
+    return nullptr;
+  }
+
   if (node->valueFn != nullptr) {
     return new String((node->valueFn)());
   }
@@ -439,6 +431,36 @@ void LiquidCrystalMenu::dispatch(const MenuEvent &event, MenuNode *node) {
   // Trigger event
   if (fn != nullptr) {
     (fn)();
+  }
+}
+
+
+/**
+ * Generic add a node somewhere in the menu system
+ */
+void LiquidCrystalMenu::addNode(MenuNode *root, MenuNode *toAdd) {
+  MenuNode *tmp = nullptr;
+
+  toAdd->parent = root; // Give the new element a parent
+
+  // Handle adding something to the root menu
+  if (root == this->root) {
+    tmp = getLastNodeInList(root);
+    tmp->next = toAdd;
+    toAdd->previous = tmp;
+    return;
+  }
+
+  // Handle not adding to the root menu
+  if (root->submenu == nullptr) {
+    // First in submenu
+    root->submenu = toAdd;
+  }
+  else {
+    // Add at the end of the submenu
+    tmp = getLastNodeInList(root->submenu);
+    tmp->next = toAdd;
+    toAdd->previous = tmp;
   }
 }
 
