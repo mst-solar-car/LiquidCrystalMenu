@@ -56,8 +56,8 @@ struct MenuNode {
   MenuNode *previous;
   MenuNode *next;
 
-  void (*focusEvent)(void);
-  void (*selectEvent)(void);
+  void (*focusEvent)(MenuEvent, MenuID);
+  void (*selectEvent)(MenuEvent, MenuID);
 };
 
 
@@ -96,7 +96,7 @@ private:
   String* getValue(MenuNode *node);
 
   // Attach an event listener
-  void attach(const MenuEvent &event, MenuNode *node, void (*callback)(void));
+  void attach(const MenuEvent &event, MenuNode *node, void (*callback)(MenuEvent, MenuID));
 
   // Dispatch an event callback to a node
   void dispatch(const MenuEvent &event, MenuNode *node);
@@ -147,10 +147,13 @@ public:
   MenuID addValue(const MenuID &parent, const char *title, String *value);
 
   // Attach an event to a menu item
-  void listen(const MenuEvent &event, const MenuID &menu, void (*callback)(void));
+  void listen(const MenuEvent &event, const MenuID &menu, void (*callback)(MenuEvent, MenuID));
 
   // Retrieves a value
   String getValue(const MenuID &menu);
+
+  // Update a value
+  String setValue(const MenuID &menu, String *newValue);
 
   // Refresh values currently displayed
   void refreshValues();
