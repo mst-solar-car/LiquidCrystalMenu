@@ -3,6 +3,14 @@ This is an Arduino library for easily creating a menus for LCD screens.
 
 At the heart of this library, it is just a wrapper around the LiquidCrystal library.
 
+&nbsp;
+
+# Before You Begin
+Before you get started with this library, you should be familiar with the Arduino [LiquidCrystal](https://www.arduino.cc/en/Reference/LiquidCrystal) library, and how to use it.
+
+See [this tutorial](https://www.arduino.cc/en/Tutorial/HelloWorld?from=Tutorial.LiquidCrystal) for the basics of using an LCD with your Arduino.
+
+&nbsp;
 
 # Installation
 For installation of this library please follow [this tutorial](https://www.arduino.cc/en/Guide/Libraries) (go to the "Importing a .zip library" section).
