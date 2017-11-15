@@ -43,7 +43,7 @@ typedef int MenuID;
  * Doubly Linked List node that represents something on a menu
  */
 struct MenuNode {
-  String title;
+  char *title;
   String (*valueFn)(void);
   String *value;
 
@@ -65,23 +65,15 @@ struct MenuNode {
  */
 class LiquidCrystalMenu {
 private:
-  // Pins for the LCD
-  int pin_rs;
-  int pin_rw;
-  int pin_en;
-  int pin_d4;
-  int pin_d5;
-  int pin_d6;
-  int pin_d7;
-
   // LCD size and object
-  int rows;
-  int cols;
+  uint8_t rows;
+  uint8_t cols;
   LiquidCrystal* lcd;
 
   MenuNode *root; // Root menu
   MenuNode *menu; // Currently selected MenuNode
 
+  // Draw on the
   void draw();
 
   // Finds an item with a memory address
@@ -92,30 +84,33 @@ private:
 
 public:
   // Constructor
-  LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5, int d6, int d7);
+  LiquidCrystalMenu(const uint8_t &rs, const uint8_t &rw, const uint8_t &en,
+                    const uint8_t &d4, const uint8_t &d5, const uint8_t &d6,
+                    const uint8_t &d7
+                  );
 
   // Destructor
   ~LiquidCrystalMenu();
 
   // Start the library
-  void begin(const int cols, const int rows);
+  void begin(const uint8_t &cols, const uint8_t &rows);
 
   // Shows a splash screen
-  void splash(const String contents[], const int delayMs = 4000);
+  void splash(const String contents[], const uint8_t &delayMs = 4000);
 
   // Add a new menu item (to the root menu)
-  MenuID addMenu(const String title);
+  MenuID addMenu(const char *title);
 
   // Add a new menu item to a specific menu
-  MenuID addMenu(const MenuID &parent, const String title);
+  MenuID addMenu(const MenuID &parent, const char *title);
 
   // Add a value to the root menus
-  void addValue(const String title, String (*callback)(void));
-  void addValue(const String title, String *value);
+  void addValue(const char *title, String (*callback)(void));
+  void addValue(const char *title, String *value);
 
   // Add a value to a specific menu
-  void addValue(const MenuID &parent, const String title, String (*callback)(void), String *value = nullptr );
-  void addValue(const MenuID &parent, const String title, String *value);
+  void addValue(const MenuID &parent, const char *title, String (*callback)(void), String *value = nullptr );
+  void addValue(const MenuID &parent, const char *title, String *value);
 
   // Refresh values currently displayed
   void refreshValues();
@@ -135,7 +130,7 @@ public:
 
 
 // Helper functions
-MenuNode* newMenuNode(const String &title, String (*fn)(void) = nullptr, String *val = nullptr);
+MenuNode* newMenuNode(const char *title, String (*fn)(void) = nullptr, String *val = nullptr);
 void deleteMenuNode(MenuNode *node);
 MenuNode* getLastNodeInList(MenuNode *list);
 

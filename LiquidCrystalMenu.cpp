@@ -7,22 +7,17 @@ byte menuArrow[8] = {0b00000,0b00100,0b00010,0b11111,0b00010,0b00100,0b00000,0b0
 /**
  * Basic constructor
  */
-LiquidCrystalMenu::LiquidCrystalMenu(int rs, int rw, int enable, int d4, int d5, int d6, int d7) {
-  this->pin_rs = rs;
-  this->pin_rw = rw;
-  this->pin_en = enable;
-  this->pin_d4 = d4;
-  this->pin_d5 = d5;
-  this->pin_d6 = d6;
-  this->pin_d7 = d7;
-
-  this->lcd = new LiquidCrystal(rs, rw, enable, d4, d5, d6, d7);
+LiquidCrystalMenu::LiquidCrystalMenu(
+  const uint8_t &rs, const uint8_t &rw, const uint8_t &en, const uint8_t &d4,
+  const uint8_t &d5, const uint8_t &d6, const uint8_t &d7
+) {
+  this->lcd = new LiquidCrystal(rs, rw, en, d4, d5, d6, d7);
 
   // Register Glyphs with the LCD
   this->lcd->createChar(MENU_ARROW_GLYPH, menuArrow);
 
   // Initialize pointers
-  this->root = newMenuNode(F("$ROOT"), nullptr, nullptr);
+  this->root = newMenuNode("$ROOT", nullptr, nullptr);
   this->menu = this->root;
 }
 
@@ -44,7 +39,7 @@ LiquidCrystalMenu::~LiquidCrystalMenu() {
 /**
  * Initialize and begin the library
  */
-void LiquidCrystalMenu::begin(const int cols, const int rows) {
+void LiquidCrystalMenu::begin(const uint8_t &cols, const uint8_t &rows) {
   this->rows = rows;
   this->cols = cols;
 
@@ -59,7 +54,7 @@ void LiquidCrystalMenu::begin(const int cols, const int rows) {
 /**
  * Custom Splash Screen for the display
  */
-void LiquidCrystalMenu::splash(const String contents[], const int delayMs) {
+void LiquidCrystalMenu::splash(const String contents[], const uint8_t &delayMs /*= 4000*/) {
   this->lcd->clear();
 
   // Display number of rows
@@ -77,7 +72,7 @@ void LiquidCrystalMenu::splash(const String contents[], const int delayMs) {
 /**
  * A a menu to a specific menu
  */
-MenuID LiquidCrystalMenu::addMenu(const MenuID &parent, const String title) {
+MenuID LiquidCrystalMenu::addMenu(const MenuID &parent, const char *title) {
   // Find parent
   MenuNode *parentPtr = this->findNodeWithAddr(this->root, parent);
 
@@ -97,7 +92,7 @@ MenuID LiquidCrystalMenu::addMenu(const MenuID &parent, const String title) {
 /**
  * Add a menu to the root menu
  */
-MenuID LiquidCrystalMenu::addMenu(const String title) {
+MenuID LiquidCrystalMenu::addMenu(const char *title) {
   return this->addMenu((MenuID)(this->root), title);
 }
 
@@ -105,7 +100,7 @@ MenuID LiquidCrystalMenu::addMenu(const String title) {
 /**
  * Adds a value to the menu
  */
-void LiquidCrystalMenu::addValue(const MenuID &parent, const String title, String (*callback)(void), String *value /*= nullptr*/) {
+void LiquidCrystalMenu::addValue(const MenuID &parent, const char *title, String (*callback)(void), String *value /*= nullptr*/) {
   // Find parent
   MenuNode *parentPtr = this->findNodeWithAddr(this->root, parent);
 
@@ -122,7 +117,7 @@ void LiquidCrystalMenu::addValue(const MenuID &parent, const String title, Strin
 /**
  * Adds a value to a specific menu
  */
-void LiquidCrystalMenu::addValue(const MenuID &parent, const String title, String *value) {
+void LiquidCrystalMenu::addValue(const MenuID &parent, const char *title, String *value) {
   return this->addValue(parent, title, nullptr, value);
 }
 
@@ -130,7 +125,7 @@ void LiquidCrystalMenu::addValue(const MenuID &parent, const String title, Strin
 /**
  * Add a value to the root
  */
-void LiquidCrystalMenu::addValue(const String title, String (*callback)(void)) {
+void LiquidCrystalMenu::addValue(const char *title, String (*callback)(void)) {
   return this->addValue((MenuID)(this->root), title, callback);
 }
 
@@ -138,7 +133,7 @@ void LiquidCrystalMenu::addValue(const String title, String (*callback)(void)) {
 /**
  * Add a value to the root
  */
-void LiquidCrystalMenu::addValue(const String title, String *value) {
+void LiquidCrystalMenu::addValue(const char *title, String *value) {
   return this->addValue((MenuID)(this->root), title, value);
 }
 
@@ -345,7 +340,7 @@ MenuNode* LiquidCrystalMenu::findNodeWithAddr(MenuNode *node, const MenuID &memA
 /**
  * Helper function for creating a new MenuNode and initializing values
  */
-MenuNode* newMenuNode(const String &title, String (*fn)(void), String *val) {
+MenuNode* newMenuNode(const char *title, String (*fn)(void), String *val) {
   MenuNode *node = new MenuNode;
   node->title = title;
   node->parent = nullptr;
