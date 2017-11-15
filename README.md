@@ -7,7 +7,7 @@ At the heart of this library, it is just a wrapper around the LiquidCrystal libr
 # Installation
 For installation of this library please follow [this tutorial](https://www.arduino.cc/en/Guide/Libraries) (go to the "Importing a .zip library" section).
 
-Get the zip folder from the [releases](/tags) or by cloning this repository and creating the zip folder yourself.
+Get the zip folder from the tags page or by cloning this repository and creating the zip folder yourself.
 
 
 # Examples
