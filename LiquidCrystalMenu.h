@@ -79,12 +79,29 @@ private:
   // Adds to a menu
   void addNode(MenuNode *root, MenuNode *toAdd);
 
+  // Initialize (constructor)
+  void init();
+
 public:
-  // Constructor
+  // Constructors
   LiquidCrystalMenu(const uint8_t &rs, const uint8_t &rw, const uint8_t &en,
                     const uint8_t &d4, const uint8_t &d5, const uint8_t &d6,
                     const uint8_t &d7
                   );
+  LiquidCrystalMenu(const uint8_t &rs, const uint8_t &en, const uint8_t &d4,
+                    const uint8_t &d5, const uint8_t &d6, const uint8_t &d7
+                  );
+  LiquidCrystalMenu(const uint8_t &rs, const uint8_t &en, const uint8_t &d0,
+                    const uint8_t &d1, const uint8_t &d2, const uint8_t &d3,
+                    const uint8_t &d4, const uint8_t &d5, const uint8_t &d6,
+                    const uint8_t &d7
+                  );
+  LiquidCrystalMenu(const uint8_t &rs, const uint8_t &rw, const uint8_t &en,
+                    const uint8_t &d0, const uint8_t &d1, const uint8_t &d2,
+                    const uint8_t &d3, const uint8_t &d4, const uint8_t &d5,
+                    const uint8_t &d6, const uint8_t &d7
+                  );
+
 
   // Destructor
   ~LiquidCrystalMenu();

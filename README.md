@@ -17,6 +17,7 @@ For installation of this library please follow [this tutorial](https://www.ardui
 
 Get the zip folder from the tags page or by cloning this repository and creating the zip folder yourself.
 
+&nbsp;
 
 # Examples
 Looking at, running, and modifying the examples provided by this library, is probably
@@ -33,6 +34,8 @@ Example | Level | Description |
 [Values](examples/Advanced/Values/Values.ino) | Advanced | Creates values that get displayed on the LCD |
 [Changing Values](examples/Advanced/ChangingValues/ChangingValues.ino) | Advanced | Shows how to modify values that are displayed on the screen |
 
+&nbsp;
+
 # Usage
 This section will cover the basics of the API, but for working examples please refer to the [examples](examples/).
 
@@ -41,23 +44,17 @@ You must include the library before you can use it:
 #include <LiquidCrystalMenu.h>
 ```
 
+&nbsp;
+
 ## Creating an Instance
 Next, you'll need to create the `LiquidCrystalMenu` object, to do this,you need to connect the following pins from your LCD to your Arduino.
 
-Pin |
-----|
-RS |
-RW |
-EN (Enable) |
-D4 |
-D5 |
-D6 |
-D7
-
-Once you have those pins connected you can call the constructor
 ```c
 LiquidCrystalMenu myMenu(RS, RW, EN, D4, D5, D6, D7);
 ```
+
+This library also accepts any of the constructors provided by the [LiquidCrystal library](https://www.arduino.cc/en/Reference/LiquidCrystalConstructor).
+
 
 Next, inside your `setup()` function you'll want to perform the following:
 

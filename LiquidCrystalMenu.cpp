@@ -5,19 +5,55 @@ byte menuArrow[8] = {0b00000,0b00100,0b00010,0b11111,0b00010,0b00100,0b00000,0b0
 
 
 /**
- * Basic constructor
+ * Constructors
  */
 LiquidCrystalMenu::LiquidCrystalMenu(
   const uint8_t &rs, const uint8_t &rw, const uint8_t &en, const uint8_t &d4,
   const uint8_t &d5, const uint8_t &d6, const uint8_t &d7
 ) {
+  // Create the LCD instance
   this->lcd = new LiquidCrystal(rs, rw, en, d4, d5, d6, d7);
+  this->init();
+}
 
+LiquidCrystalMenu::LiquidCrystalMenu(
+  const uint8_t &rs, const uint8_t &en, const uint8_t &d4,
+  const uint8_t &d5, const uint8_t &d6, const uint8_t &d7
+) {
+  this->lcd = new LiquidCrystal(rs, en, d4, d5, d6, d7);
+  this->init();
+}
+
+LiquidCrystalMenu::LiquidCrystalMenu(
+  const uint8_t &rs, const uint8_t &en, const uint8_t &d0,
+  const uint8_t &d1, const uint8_t &d2, const uint8_t &d3,
+  const uint8_t &d4, const uint8_t &d5, const uint8_t &d6,
+  const uint8_t &d7
+) {
+  this->lcd = new LiquidCrystal(rs, en, d0, d1, d2, d3, d4, d5, d6, d7);
+  this->init();
+}
+
+LiquidCrystalMenu::LiquidCrystalMenu(
+  const uint8_t &rs, const uint8_t &rw, const uint8_t &en,
+  const uint8_t &d0, const uint8_t &d1, const uint8_t &d2,
+  const uint8_t &d3, const uint8_t &d4, const uint8_t &d5,
+  const uint8_t &d6, const uint8_t &d7
+) {
+  this->lcd = new LiquidCrystal(rs, rw, en, d0, d1, d2, d3, d4, d5, d6, d7);
+  this->init();
+}
+
+
+/**
+ * Initializes the library (called by constructors)
+ */
+void LiquidCrystalMenu::init() {
   // Register Glyphs with the LCD
   this->lcd->createChar(MENU_ARROW_GLYPH, menuArrow);
 
-  // Initialize pointers
-  this->root = newMenuNode("$ROOT", nullptr, nullptr);
+  // Create root node
+  this->root = newMenuNode("$", nullptr, nullptr);
   this->menu = this->root;
 }
 
@@ -375,6 +411,8 @@ void deleteMenuNode(MenuNode *node) {
     node->submenu = nullptr;
   }
 
+  delete node->title;
+  node->title = NULL;
   node->parent = NULL;
   node->previous = NULL;
   node->valueFn = NULL;
