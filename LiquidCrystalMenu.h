@@ -25,9 +25,6 @@
 /**
  * Constants
  */
-#ifndef LCDMENU_ARRAY_INCREMENT
-  #define LCDMENU_ARRAY_INCREMENT   2
-#endif
 #ifndef LCDMENU_ACTION_DEBOUNCE
   #define LCDMENU_ACTION_DEBOUNCE   350
 #endif

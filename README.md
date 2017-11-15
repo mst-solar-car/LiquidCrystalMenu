@@ -184,6 +184,17 @@ represent and it will be reflected on the screen.
 To do this, all you need to do is add the `refreshValues()` method to your `loop()` function.
 This will allow for the screen to show the new value automatically.
 
+&nbsp;
+
+## Constants
+The following table lists the constants (`#define`) that are used by this library.
+
+You can override these by doing `#define CONSTNAT_NAME value` before the `#include <LiquidCrystalMenu.h>` in your sketch.
+
+Constant | Description | Default |
+---------|-------------|---------|
+`LCDMENU_ACTION_DEBOUNCE` | Amount of time (in milliseconds) to delay at the end of the movement methods(`up()`, `down()`, `select()`, `back()`) | 350 |
+`LCDMENU_REFRESH_INTERVAL` | Number of milliseconds used as a throttle for the `refreshValues()` method. The higher the interval the more milliseconds must pass before the library updates the value on the screen. | 750 |
 
 
 

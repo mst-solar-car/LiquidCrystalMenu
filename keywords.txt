@@ -6,18 +6,32 @@
 # Library (KEYWORD1)
 #######################################
 
-LiquidCrystalMenu			KEYWORD1
+LiquidCrystalMenu	KEYWORD1
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
+MenuID	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
+begin	KEYWORD2
+splash	KEYWORD2
+addMenu	KEYWORD2
+addValue	KEYWORD2
+refreshValues	KEYWORD2
+up	KEYWORD2
+down	KEYWORD2
+select	KEYWORD2
+back	KEYWORD2
+
 
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+LCDMENU_ACTION_DEBOUNCE	LITERAL1 
+LCDMENU_REFRESH_INTERVAL	LITERAL1
