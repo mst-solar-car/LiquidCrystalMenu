@@ -151,8 +151,8 @@ With the LiquidCrystalMenu library you have the ability to subscribe to events t
 happen on the menu.
 
 These events are:
-  - `Focus`
-  - `Select`
+  - `FocusEvent` - when a menu option comes into focus
+  - `SelectEvent` - when a menu option is selected
 
 These are added using the following method:
 
@@ -160,7 +160,7 @@ These are added using the following method:
 
 Parameter | Type | Description | Default |
 ----------|------|-------------|---------|
-1 | MenuEvent | Type of event (`Focus` or `Select`) | N/A |
+1 | MenuEvent | Type of event (`FocusEvent` or `SelectEvent`) | N/A |
 2 | MenuItem | Menu item the event occured on | N/A |
 
 
