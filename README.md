@@ -146,6 +146,44 @@ This will give the following menu structure:
 
 &nbsp;
 
+## Event Listeners
+With the LiquidCrystalMenu library you have the ability to subscribe to events that
+happen on the menu.
+
+These events are:
+  - `Focus`
+  - `Select`
+
+These are added using the following method:
+
+`listen(MenuEvent, MenuID, void *fn(MenuEvent, MenuItem))`
+
+Parameter | Type | Description | Default |
+----------|------|-------------|---------|
+1 | MenuEvent | Type of event (`Focus` or `Select`) | N/A |
+2 | MenuItem | Menu item the event occured on | N/A |
+
+
+```c
+void MyEventListener(MenuEvent event, MenuItem item) {
+  // This will get called when an event happens
+}
+
+MenuID option1 = myMenu.addMenu("Option 1");
+MenuID option2 = myMenu.addMenu("Option 2");
+
+// Subcribe to events
+myMenu.listen(FocusEvent, option1, &MyEventListener);
+myMenu.listen(FocusEvent, option2, &MyEventListener);
+```
+
+`MenuItem` is a struct that is used for events only. It has two members:
+
+- `id` the MenuID
+- `title` the title of the menu
+
+&nbsp;
+
 ## Displaying Values
 Since you are using a menu system with an Arduino you are probably wanting to
 use it to show data. This is also easily done with this Library, using one of the
