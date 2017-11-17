@@ -1,27 +1,36 @@
  /**
- * This example is the most complex one.
+ * This example is one of the higher level intermediate examples.
  *
- * You should absolutely be comfortable with the Values example, and all the
- * other examples.
- *
- * You will also want a knowledge, and understanding, of pointers.
+ * You should be comfortable with pointers and nested menus before you begin this
+ * example.
  *
  * For information on pointers see:
  * https://www.arduino.cc/reference/en/language/structure/pointer-access-operators/reference/
  *
- * Also, make sure you have looked at and understand the menu-with-values example.
- *
  * ---
- * Since you provide your LiquidCrystalMenu object a pointer when setting values,
- * that means you can change the value of whatever it points to and it will
- * reflect on the LCD screen.
  *
- * To automatically update the LCD screen with new variable values all you need
- * to do is add the following line to your loop() function:
+ * Somtimes you might want to know when a menu item is entered, or a menu item
+ * is focused. The LiquidCrystalMenu library allows you to easily do this.
  *
- *  menu.refreshValues();
+ * Use the following method:
+ *    menu.listen(MenuEvent, MenuID, callback);
  *
- * Where menu is your LiquidCrystalMenu object.
+ * Where MenuEvent is:
+ *    FocusEvent
+ *    SelectEvent
+ *
+ * MenuID is the value returned from addMenu or addValue methods
+ *
+ * callback is a pointer to a function that will be executed when the event
+ * happens.
+ *
+ * Your callback function should accept two parameters:
+ *    1st: a MenuEvent type
+ *    2nd: a value of type MenuItem
+ *
+ * MenuItem is a struct type that has two members:
+ *    id: type MenuID (id of the menu item)
+ * title: Type String (title of the menu item)
  *
  */
 #include <LiquidCrystalMenu.h>
@@ -81,16 +90,22 @@ void setup() {
 
   // Create menu structure
   MenuID option1 = navigation.addMenu("Option 1");
+  MenuID option2 = navigation.addMenu("Option 2");
+
+  // Add submenus
+  MenuID option21 = navigation.addMenu(option2, "Option 2.1");
+  MenuID option22 = navigation.addMenu(option2, "Option 2.2");
+
+  // ==== Add Event Listeners ====
+  // Subscribe to the Focus Event for menu option 1
   navigation.listen(FocusEvent, option1, &MenuOptionHighlighted);
 
-  MenuID option2 = navigation.addMenu("Option 2");
+  // Subscribe to the select and focus event for menu option 2
   navigation.listen(FocusEvent, option2, &MenuOptionHighlighted);
   navigation.listen(SelectEvent, option2, &EnteredSubmenu);
 
-  MenuID option21 = navigation.addMenu(option2, "Option 2.1");
+  // Subscribe to the focus events on the submenus
   navigation.listen(FocusEvent, option21, &MenuOptionHighlighted);
-
-  MenuID option22 = navigation.addMenu(option2, "Option 2.2");
   navigation.listen(FocusEvent, option22, &MenuOptionHighlighted);
 
 
