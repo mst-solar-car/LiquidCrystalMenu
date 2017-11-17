@@ -31,6 +31,7 @@ Example | Level | Description |
 [Simple Menu](examples/Beginner/SimpleMenu/SimpleMenu.ino) | Beginner | Create a basic menu |
 [Splash Screen](examples/Beginner/SplashScreen/SplashScreen.ino) | Beginner | Shows how to create a splash screen |
 [Nested Menus](examples/Intermediate/NestedMenus/NestedMenus.ino) | Intermediate | Creates menus inside of other menus |
+[Events](examples/Intermediate/Events/Events.ino) | Intermediate | Adding event listeners to menu options |
 [Values](examples/Advanced/Values/Values.ino) | Advanced | Creates values that get displayed on the LCD |
 [Changing Values](examples/Advanced/ChangingValues/ChangingValues.ino) | Advanced | Shows how to modify values that are displayed on the screen |
 

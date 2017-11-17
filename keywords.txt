@@ -22,6 +22,8 @@ begin	KEYWORD2
 splash	KEYWORD2
 addMenu	KEYWORD2
 addValue	KEYWORD2
+listen	KEYWORD2
+getValue	KEYWORD2
 refreshValues	KEYWORD2
 up	KEYWORD2
 down	KEYWORD2

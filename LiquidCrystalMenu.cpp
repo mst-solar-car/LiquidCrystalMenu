@@ -179,7 +179,7 @@ MenuID LiquidCrystalMenu::addValue(const char *title, String *value) {
 /**
  * Add an event listener to a node
  */
-void LiquidCrystalMenu::listen(const MenuEvent &event, const MenuID &menu, void (*callback)(MenuEvent, MenuID)) {
+void LiquidCrystalMenu::listen(const MenuEvent &event, const MenuID &menu, void (*callback)(MenuEvent, MenuItem)) {
   // Attach a node
   MenuNode *node = this->findNodeWithAddr(this->root, menu);
   if (node == this->root) {
@@ -206,7 +206,6 @@ String LiquidCrystalMenu::getValue(const MenuID &menu) {
 
   return *val;
 }
-
 
 
 /**
@@ -242,7 +241,6 @@ void LiquidCrystalMenu::draw() {
   if (val != nullptr) {
     // Give section a title
     this->lcd->print(this->menu->title);
-    this->lcd->print(":");
     this->lcd->setCursor(0, 1);
 
     this->lcd->print(*val);
@@ -401,7 +399,7 @@ String* LiquidCrystalMenu::getValue(MenuNode *node) {
 /**
  * Attaches an event to a node
  */
-void LiquidCrystalMenu::attach(const MenuEvent &event, MenuNode *node, void (*callback)(MenuEvent, MenuID)) {
+void LiquidCrystalMenu::attach(const MenuEvent &event, MenuNode *node, void (*callback)(MenuEvent, MenuItem)) {
   switch (event) {
     case FocusEvent:
       node->focusEvent = callback;
@@ -417,7 +415,9 @@ void LiquidCrystalMenu::attach(const MenuEvent &event, MenuNode *node, void (*ca
  * Dispatch an event to a menu item
  */
 void LiquidCrystalMenu::dispatch(const MenuEvent &event, MenuNode *node) {
-  void (*fn)(MenuEvent, MenuID) = nullptr;
+  void (*fn)(MenuEvent, MenuItem) = nullptr;
+
+  MenuItem item = MenuItem { (int)node, String(node->title) };
 
   switch (event) {
     case FocusEvent:
@@ -430,7 +430,7 @@ void LiquidCrystalMenu::dispatch(const MenuEvent &event, MenuNode *node) {
 
   // Trigger event
   if (fn != nullptr) {
-    (fn)(event, (int)node);
+    (fn)(event, item);
   }
 }
 

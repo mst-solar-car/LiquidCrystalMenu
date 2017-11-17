@@ -32,16 +32,28 @@
   #define LCDMENU_REFRESH_INTERVAL  750 // Number of milliseconds to allow for refreshing
 #endif
 
+
+
 /**
  * Enum for events
  */
 enum MenuEvent {
   FocusEvent,    // When a menu item gains focus
-  SelectEvent   // When a menu value is selected
+  SelectEvent    // When a menu value is selected
 };
 
 // Type alias
 typedef int MenuID;
+
+
+/**
+ * Struct to send to events
+ */
+struct MenuItem {
+  MenuID id;
+  String title;
+};
+
 
 /**
  * Doubly Linked List node that represents something on a menu
@@ -56,9 +68,11 @@ struct MenuNode {
   MenuNode *previous;
   MenuNode *next;
 
-  void (*focusEvent)(MenuEvent, MenuID);
-  void (*selectEvent)(MenuEvent, MenuID);
+  void (*focusEvent)(MenuEvent, MenuItem);
+  void (*selectEvent)(MenuEvent, MenuItem);
 };
+
+
 
 
 /**
@@ -96,7 +110,7 @@ private:
   String* getValue(MenuNode *node);
 
   // Attach an event listener
-  void attach(const MenuEvent &event, MenuNode *node, void (*callback)(MenuEvent, MenuID));
+  void attach(const MenuEvent &event, MenuNode *node, void (*callback)(MenuEvent, MenuItem));
 
   // Dispatch an event callback to a node
   void dispatch(const MenuEvent &event, MenuNode *node);
@@ -147,13 +161,10 @@ public:
   MenuID addValue(const MenuID &parent, const char *title, String *value);
 
   // Attach an event to a menu item
-  void listen(const MenuEvent &event, const MenuID &menu, void (*callback)(MenuEvent, MenuID));
+  void listen(const MenuEvent &event, const MenuID &menu, void (*callback)(MenuEvent, MenuItem));
 
   // Retrieves a value
   String getValue(const MenuID &menu);
-
-  // Update a value
-  String setValue(const MenuID &menu, String *newValue);
 
   // Refresh values currently displayed
   void refreshValues();
